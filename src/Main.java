@@ -5,8 +5,6 @@ import java.util.*;
 
 public class Main {
 
-
-    // --------------------- TECHNIQUE 1 START ---------------
     public static void main(String[] args) throws FileNotFoundException {
 
         Scanner scan = new Scanner(new File("dict.txt"));
@@ -17,15 +15,17 @@ public class Main {
             dict.add(scan.next());
         }
 
-        //TechniqueOne(dict);
-        //TechniqueTwo(dict);
-        //TechniqueThree(dict);
+
+        TechniqueOne(dict);
+        TechniqueTwo(dict);
+        TechniqueThree(dict);
 
 
     }
 
     // for each letter in word1, search word2 for letter. If found, delete from word 2
     private static void TechniqueOne(ArrayList<String> dict) {
+        long start = System.nanoTime();
         HashMap<String, Integer> anagramsMap = new HashMap<String, Integer>();
         for (int i = 0; i < dict.size(); i++) {
             String word1 = dict.get(i).toLowerCase();
@@ -63,11 +63,16 @@ public class Main {
                 maxEntry = entry;
             }
         }
-        System.out.println(maxEntry);
+        long end = System.nanoTime();
+        long seconds = (end - start) / 1000000000;
+        System.out.println("TECHNIQUE ONE TIME: " + seconds + " SECONDS");
+        System.out.println("===================");
+        System.out.println(maxEntry + "\n");
     }
 
     // sort word 1, sort word 2, compare the two sorted words
     private static void TechniqueTwo(ArrayList<String> dict) {
+        long start = System.nanoTime();
 
         HashMap<String, Integer> anagramsMap = new HashMap<String, Integer>();
 
@@ -81,7 +86,7 @@ public class Main {
                 Arrays.sort(word2);
 
                 if (word1.length != word2.length) continue;
-                if (Arrays.equals(word1,word2)) {
+                if (Arrays.equals(word1, word2)) {
                     count++;
                 }
             }
@@ -97,41 +102,40 @@ public class Main {
                 maxEntry = entry;
             }
         }
-        System.out.println(maxEntry);
+        long end = System.nanoTime();
+        long seconds = (end - start) / 1000000000;
+        System.out.println("TECHNIQUE TWO TIME: " + seconds + " SECONDS");
+        System.out.println("===================");
+        System.out.println(maxEntry + "\n");
     }
-    //create a letter array for word1 and word2. Compare the letter array CHECK
+
+    //create a letter array for word1 and word2. Compare the letter array
     private static void TechniqueThree(ArrayList<String> dict) {
+        long start = System.nanoTime();
 
         HashMap<String, Integer> anagramsMap = new HashMap<String, Integer>();
 
         for (int i = 0; i < dict.size(); i++) {
             String word1 = dict.get(i).toLowerCase();
-
-
             int count = 0;
             for (int j = i + 1; j < dict.size(); j++) {
+                int array[] = new int[128];
+
                 String word2 = dict.get(j).toLowerCase();
                 StringBuilder sb = new StringBuilder();
                 if (word1.length() != word2.length()) continue;
 
-                sb.append(word1);
-                sb.append(word2);
-                char [] combined = sb.toString().toCharArray();
-                int duplicateCount = 0;
-
-                for (int k = 0; k < combined.length; k++) {
-                    for (int l = k + 1 ; l < combined.length; l++) {
-
-                        if (combined[k] == (combined[l])) {
-                            duplicateCount++;
-                           // what? This does not work
-                        }
-                    }
+                for (int k = 0; k < word1.length(); ++k) {
+                    array[(int) word1.charAt(k)]++;
                 }
 
-                if (duplicateCount == word1.length()){
-                    count++;
+                for (int k = 0; k < word1.length(); ++k) {
+                    array[(int) word2.charAt(k)]--;
                 }
+
+                // check each element if they are 0
+                if (Tech3Helper(array)) count++;
+
             }
             // here make a dict with the word and the count
             anagramsMap.put(word1, count);
@@ -145,7 +149,21 @@ public class Main {
                 maxEntry = entry;
             }
         }
+        long end = System.nanoTime();
+        long seconds = (end - start) / 1000000000;
+        System.out.println("TECHNIQUE THREE TIME : " + seconds + " SECONDS");
+        System.out.println("===================");
         System.out.println(maxEntry);
+
+    }
+
+    private static boolean Tech3Helper(int[] array) {
+        for (int in : array) {
+            if (in != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
